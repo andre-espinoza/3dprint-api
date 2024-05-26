@@ -10,7 +10,7 @@ const ProductSchema = new Schema({
   image4: { type: String, required: false },
   image5: { type: String, required: false },
   category: { type: String, required: true },
-  createdTime: { type: Date, required: true },
+  createdTime: { type: String, required: true },
 });
 
 // Export model

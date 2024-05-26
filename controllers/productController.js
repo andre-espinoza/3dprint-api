@@ -27,10 +27,7 @@ exports.product_create = [
     .trim()
     .isLength({ min: 1 })
     .escape(),
-  body("createdTime")
-    .isISO8601()
-    .toDate()
-    .withMessage("Date must be a valid date"),
+  body("createdTime").isISO8601().withMessage("Date must be a valid date"),
   body("image1", "image1 must be specified")
     .trim()
     .isLength({ min: 1 })
@@ -81,16 +78,9 @@ exports.product_create = [
 
 exports.product_list = asyncHandler(async (req, res, next) => {
   const products = await Product.find().sort({ name: -1 }).exec();
-  const transformedProducts = products.map((product) => {
-    return {
-      ...product._doc, // Use the spread operator to include all fields
-      createdTime: product.createdTime
-        ? product.createdTime.toISOString().split("T")[0]
-        : null,
-    };
-  });
-  console.log(`response is ${JSON.stringify(transformedProducts)}`);
-  res.json(transformedProducts);
+
+  console.log(`response is ${JSON.stringify(products)}`);
+  res.json(products);
 });
 
 exports.product_schema = asyncHandler(async (req, res, next) => {
@@ -120,7 +110,7 @@ exports.product_update = [
     .escape(),
   body("createdTime")
     .isISO8601()
-    .toDate()
+
     .withMessage("Date must be a valid date"),
   body("image1", "image1 must be specified")
     .trim()
@@ -153,14 +143,7 @@ exports.product_update = [
       try {
         jwt.verify(req.token, "secretkey");
         await Product.findByIdAndUpdate(req.params.id, updatedProduct, {});
-        //delte missing flavours field
-        if (!updatedProduct.flavours) {
-          await Product.findByIdAndUpdate(
-            req.params.id,
-            { $unset: { flavours: 1 } },
-            {}
-          );
-        }
+
         res.status(200).json({});
       } catch (error) {
         console.log("Error occurred bro:", error);
