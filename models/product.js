@@ -4,11 +4,13 @@ const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema({
   name: { type: String, required: true },
-  imgUrl: { type: String, required: true },
-  flavours: { type: Number, required: false },
-  outOfStock: { type: Boolean, required: false },
-  price: { type: Number, required: true },
-  description: { type: String, required: false },
+  image1: { type: String, required: true },
+  image2: { type: String, required: false },
+  image3: { type: String, required: false },
+  image4: { type: String, required: false },
+  image5: { type: String, required: false },
+  category: { type: String, required: true },
+  createdTime: { type: Date, required: true },
 });
 
 // Export model

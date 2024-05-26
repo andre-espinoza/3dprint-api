@@ -23,29 +23,23 @@ exports.product_create = [
   getBearerHeaderToSetTokenStringOnReq,
   // Validate body and sanitize fields.
   body("name", "name must be specified").trim().isLength({ min: 1 }).escape(),
-
-  body("price", "price must be specified").trim().escape().isNumeric(),
-
-  body("imgUrl", "imgUrl must be specified")
+  body("category", "category must be specified")
     .trim()
     .isLength({ min: 1 })
     .escape(),
-  body("outOfStock")
-    .optional() // Allows the field to not be present
+  body("createdTime")
+    .isISO8601()
+    .toDate()
+    .withMessage("Date must be a valid date"),
+  body("image1", "image1 must be specified")
     .trim()
-    .escape()
-    .isBoolean()
-    .withMessage("outOfStock must be a boolean value"),
-  body("flavours")
-    .optional() // Allows the field to be absent
-    .trim()
-    .escape()
-    .isNumeric()
-    .withMessage("Flavours must be a valid number"),
-  body("description")
-    .optional() // Allows the field to be absent
-    .trim()
+    .isLength({ min: 1 })
     .escape(),
+  body("image2").optional().trim().escape(),
+  body("image3").optional().trim().escape(),
+  body("image4").optional().trim().escape(),
+  body("image5").optional().trim().escape(),
+
   // Process request after validation and sanitization.
 
   async (req, res, next) => {
@@ -58,11 +52,13 @@ exports.product_create = [
 
     const product = new Product({
       name: he.decode(req.body.name),
-      price: req.body.price,
-      imgUrl: he.decode(req.body.imgUrl),
-      outOfStock: req.body.outOfStock,
-      description: req.body.description,
-      flavours: req.body.flavours,
+      category: he.decode(req.body.category),
+      createdTime: req.body.createdTime,
+      image1: he.decode(req.body.image1),
+      image2: req.body.image2 ? he.decode(req.body.image2) : undefined,
+      image3: req.body.image3 ? he.decode(req.body.image3) : undefined,
+      image4: req.body.image4 ? he.decode(req.body.image4) : undefined,
+      image5: req.body.image5 ? he.decode(req.body.image5) : undefined,
     });
 
     if (!errors.isEmpty()) {
@@ -84,9 +80,17 @@ exports.product_create = [
 ];
 
 exports.product_list = asyncHandler(async (req, res, next) => {
-  const products = await Product.find().sort({ price: -1 }).exec();
-  console.log(`response is ${JSON.stringify(products)}`);
-  res.json(products);
+  const products = await Product.find().sort({ name: -1 }).exec();
+  const transformedProducts = products.map((product) => {
+    return {
+      ...product._doc, // Use the spread operator to include all fields
+      createdTime: product.createdTime
+        ? product.createdTime.toISOString().split("T")[0]
+        : null,
+    };
+  });
+  console.log(`response is ${JSON.stringify(transformedProducts)}`);
+  res.json(transformedProducts);
 });
 
 exports.product_schema = asyncHandler(async (req, res, next) => {
@@ -110,35 +114,33 @@ exports.product_update = [
   getBearerHeaderToSetTokenStringOnReq,
   // Validate body and sanitize fields.
   body("name", "name must be specified").trim().isLength({ min: 1 }).escape(),
-
-  body("price", "price must be specified").trim().escape().isNumeric(),
-  body("description")
-    .optional() // Allows the field to be absent
-    .trim()
-    .escape(),
-  body("imgUrl", "imgUrl must be specified")
+  body("category", "category must be specified")
     .trim()
     .isLength({ min: 1 })
     .escape(),
-  body("outOfStock", "outOfStock must be specified")
+  body("createdTime")
+    .isISO8601()
+    .toDate()
+    .withMessage("Date must be a valid date"),
+  body("image1", "image1 must be specified")
     .trim()
-    .escape()
-    .isBoolean(),
-  body("flavours")
-    .optional() // Allows the field to be absent
-    .trim()
-    .escape()
-    .isNumeric()
-    .withMessage("Flavours must be a valid number"),
+    .isLength({ min: 1 })
+    .escape(),
+  body("image2").optional().trim().escape(),
+  body("image3").optional().trim().escape(),
+  body("image4").optional().trim().escape(),
+  body("image5").optional().trim().escape(),
 
   async (req, res, next) => {
     const updatedProduct = new Product({
       name: he.decode(req.body.name),
-      price: req.body.price,
-      imgUrl: he.decode(req.body.imgUrl),
-      description: req.body.description,
-      outOfStock: req.body.outOfStock,
-      flavours: req.body.flavours,
+      category: he.decode(req.body.category),
+      createdTime: req.body.createdTime,
+      image1: he.decode(req.body.image1),
+      image2: req.body.image2 ? he.decode(req.body.image2) : undefined,
+      image3: req.body.image3 ? he.decode(req.body.image3) : undefined,
+      image4: req.body.image4 ? he.decode(req.body.image4) : undefined,
+      image5: req.body.image5 ? he.decode(req.body.image5) : undefined,
       _id: req.params.id, // This is required, or a new ID will be assigned!
     });
 
