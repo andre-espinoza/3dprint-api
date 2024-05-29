@@ -80,6 +80,7 @@ exports.product_list = asyncHandler(async (req, res, next) => {
   const products = await Product.find().sort({ name: -1 }).exec();
 
   console.log(`response is ${JSON.stringify(products)}`);
+  console.log(`first`);
   res.json(products);
 });
 
