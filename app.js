@@ -10,6 +10,7 @@ var productsRouter = require(`./routes/products`);
 var flavoursRouter = require(`./routes/flavours`);
 const cors = require("cors");
 var app = express();
+app.set("trust proxy", 1); // This should go here
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
